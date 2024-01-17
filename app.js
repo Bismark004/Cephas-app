@@ -1,58 +1,84 @@
-// Load saved debtors from local storage
-let debtors = JSON.parse(localStorage.getItem('debtors')) || [];
-
 function calculateLoan() {
-    const name = document.getElementById('name').value;
-    const amount = parseFloat(document.getElementById('amount').value);
-    const interest = 0.2 * amount;
-    const total = amount + interest;
-    const dueDate = new Date();
-    dueDate.setDate(dueDate.getDate() + 30);
+  let name = document.getElementById('name').value;
+  let amount = document.getElementById('amount').value;
+  let debtorList = document.getElementById('debtorList');
 
-    // Save debtor automatically
-    if (!debtors.includes(name)) {
-        debtors.push(name);
-        saveDebtorsToStorage();
-    }
+  // Validation check
+  if (name === '' || amount === '') {
+    alert('Enter name and amount');
+  } else {
+    // Save data to local storage
+    saveToLocalStorage(name, amount);
 
-    const resultDiv = document.getElementById('result');
-    resultDiv.innerHTML = `
-      <h2>Loan Details</h2>
-      <p><strong>Borrower's Name:</strong> ${name}</p>
-      <p><strong>Loan Amount:</strong> ${amount}</p>
-      <p><strong>Interest (20%):</strong> ${interest}</p>
-      <p><strong>Total Amount Due:</strong> ${total}</p>
-      <p><strong>Due Date:</strong> ${dueDate.toDateString()}</p>
-    `;
+    // Retrieve all loan data from local storage and display
+    displayAllData();
 
-    // Update debtor list
-    updateDebtorsList();
+    // Clear input fields
+    document.getElementById('name').value = '';
+    document.getElementById('amount').value = '';
+  }
 }
 
-function deleteDebtor(index) {
-    debtors.splice(index, 1);
-    updateDebtorsList();
-    saveDebtorsToStorage();
-    alert('Debtor deleted successfully!');
+function saveToLocalStorage(name, amount) {
+  // Retrieve existing data from local storage or initialize an empty array
+  let existingData = JSON.parse(localStorage.getItem('loanData')) || [];
+
+  // Create a new data object
+  let newData = {
+    name: name,
+    amount: amount,
+    interest: amount * 0.1,
+    totalAmount: (amount * 0.1) + parseFloat(amount),
+    date: new Date().toLocaleDateString(),
+    dueDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toLocaleDateString(),
+  };
+
+  // Add the new data to the existing data array
+  existingData.push(newData);
+
+  // Save the updated data array back to local storage
+  localStorage.setItem('loanData', JSON.stringify(existingData));
 }
 
-function updateDebtorsList() {
-    const debtorList = document.getElementById('debtorList');
-    debtorList.innerHTML = '<h2>Saved Debtors</h2>';
+function displayAllData() {
+  // Retrieve all loan data from local storage
+  let allData = JSON.parse(localStorage.getItem('loanData')) || [];
 
-    debtors.forEach((debtor, index) => {
-        debtorList.innerHTML += `
-          <div>
-            <p><strong>Borrower's Name:</strong> ${debtor}</p>
-            <button onclick="deleteDebtor(${index})">Delete Debtor</button>
-          </div>
-        `;
-    });
+  // Display all data in debtorList
+  let debtorList = document.getElementById('debtorList');
+  debtorList.innerHTML = ''; // Clear existing data in debtorList
+
+  for (let i = 0; i < allData.length; i++) {
+    let data = allData[i];
+
+    let result = document.createElement('ul');
+    result.innerHTML = `<li class="borrower">
+      <p> Name: ${data.name} </p>
+      <p> Amount: ${data.amount} </p>
+      <p> Interest: ${data.interest} </p>
+      <p> Total Amount: ${data.totalAmount} </p>
+      <p> Date: ${data.date} </p>
+      <p> Due Date: ${data.dueDate} </p>
+      <button onclick="markAsPaid(${i})"> Paid </button>
+    </li>`;
+
+    debtorList.appendChild(result);
+  }
 }
 
-function saveDebtorsToStorage() {
-    localStorage.setItem('debtors', JSON.stringify(debtors));
+function markAsPaid(index) {
+  // Retrieve existing data from local storage
+  let existingData = JSON.parse(localStorage.getItem('loanData')) || [];
+
+  // Remove the item at the specified index
+  existingData.splice(index, 1);
+
+  // Save the updated data array back to local storage
+  localStorage.setItem('loanData', JSON.stringify(existingData));
+
+  // Refresh the displayed data
+  displayAllData();
 }
 
-// Initial update of the debtor list on page load
-updateDebtorsList();
+// Call displayAllData when the page loads to show existing data
+displayAllData();
