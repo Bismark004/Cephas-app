@@ -2,13 +2,14 @@ function calculateLoan() {
   let name = document.getElementById('name').value;
   let amount = document.getElementById('amount').value;
   let debtorList = document.getElementById('debtorList');
+  let percentage = document.getElementById('Percentage').value;
 
   // Validation check
   if (name === '' || amount === '') {
     alert('Enter name and amount');
   } else {
     // Save data to local storage
-    saveToLocalStorage(name, amount);
+    saveToLocalStorage(name, amount, value);
 
     // Retrieve all loan data from local storage and display
     displayAllData();
@@ -16,10 +17,11 @@ function calculateLoan() {
     // Clear input fields
     document.getElementById('name').value = '';
     document.getElementById('amount').value = '';
+    document.getElementById('percentage').value='';
   }
 }
 
-function saveToLocalStorage(name, amount) {
+function saveToLocalStorage(name, amount, percentage) {
   // Retrieve existing data from local storage or initialize an empty array
   let existingData = JSON.parse(localStorage.getItem('loanData')) || [];
 
@@ -27,8 +29,9 @@ function saveToLocalStorage(name, amount) {
   let newData = {
     name: name,
     amount: amount,
-    interest: amount * 0.1,
-    totalAmount: (amount * 0.1) + parseFloat(amount),
+    percentage: percentage,
+    interest: amount * percentage,
+    totalAmount: (amount * percentage) + parseFloat(amount),
     date: new Date().toLocaleDateString(),
     dueDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toLocaleDateString(),
   };
