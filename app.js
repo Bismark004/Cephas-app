@@ -2,14 +2,14 @@ function calculateLoan() {
   let name = document.getElementById('name').value;
   let amount = document.getElementById('amount').value;
   let debtorList = document.getElementById('debtorList');
-  let percentage = document.getElementById('Percentage').value;
+  let percentage = document.getElementById('percentage').value;
 
   // Validation check
   if (name === '' || amount === '') {
     alert('Enter name and amount');
   } else {
     // Save data to local storage
-    saveToLocalStorage(name, amount, value);
+    saveToLocalStorage(name, amount, percentage);
 
     // Retrieve all loan data from local storage and display
     displayAllData();
@@ -17,7 +17,7 @@ function calculateLoan() {
     // Clear input fields
     document.getElementById('name').value = '';
     document.getElementById('amount').value = '';
-    document.getElementById('percentage').value='';
+  
   }
 }
 
